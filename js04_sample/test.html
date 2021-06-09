@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>API課題</title>
+</head>
+
+<body>
+  <h1>周辺マップ</h1>
+  <nav class="text">
+    <div class="li_text">
+      <li id ="hospotal">病院</li>
+      <li id = "tooth">歯科医院</li>
+      <li id ="eye">眼科</li>
+      <li id ="Ghospital">総合医院</li>
+    </div>
+  </nav>
+  <div id="map">MAP</div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script
+    src="https://www.bing.com/api/maps/mapcontrol?key=Ar1DVwBs9DUEY9cv6U8LjhXrI8Ov29FdHc3nFXWyG4IlbeLndVDXY0CfyMIAagmW"></script>
+  <script>
+
+    // map表示用に使用する変数
+    let map;
+
+    // 現在地を取得するときのオプション
+    const option = {
+      enableHighAccuracy: true,
+      maximumAge: 20000,
+      timeout: 100000000
+    };
+
+    // 緯度，経度，表示したいマップを入力するとピンを立てる関数を定義.
+    // ピンの色と表示するよう設定.
+    function pushPin(lat, lng, map) {
+      const location = new Microsoft.Maps.Location(lat, lng)
+      const pin = new Microsoft.Maps.Pushpin(location, {
+        color: 'navy', // 色の設定
+        visible: true, // これ書かないとピンが見えない
+      });
+      map.entities.push(pin);
+    };
+
+    // 緯度，経度，表示したいマップを入力するとinfoboxをつくる関数を定義.
+    // 表示内容を設定する.
+    function generateInfobox(lat, lng, map) {
+      const location = new Microsoft.Maps.Location(lat, lng)
+      const infobox = new Microsoft.Maps.Infobox(location, {
+        title: 'Welcome 木蓮の家',
+        description: "https://www.oasisnavi.jp/fukuoka/miyawaka/h006178/"
+      });
+      infobox.setMap(map);
+    }
+
+    // 現在地の取得に成功したときの関数
+    function mapsInit(position) {
+      // console.log(position);
+      // const lat = position.coords.latitude;
+      // const lng = position.coords.longitude;
+      // 木蓮の家
+      // 33.73106482366766, 130.6549930221487
+      const lat_home = "33.73106482366766";
+      const lng_home = "130.6549930221487";
+      // 病院 hospital
+      // 33.730645555679715, 130.65415545521444
+      const lat_hospital = "33.73106482366766";
+      const lng_hospital = "130.6549930221487";
+      // 歯科医院 dental clinic
+      // 33.72668893597604, 130.6704748839982
+      const lat_dental = "33.73106482366766";
+      const lng_dental = "130.6549930221487";
+      // 眼科 Ophthalmology
+      // 33.72755716134463, 130.6660608289335
+      const lat_Oph = "33.73106482366766";
+      const lng_Oph = "130.6549930221487";
+      // 総合病院general Hospital
+      // 33.64205363313683, 130.69141273826682
+      const lat_Ghospital = "33.73106482366766";
+      const lng_Ghospital = "130.6549930221487";
+
+      // console.log(lat_home, lng_home);
+      // console.log(lat_home);
+      // console.log(lng_home);
+      map = new Microsoft.Maps.Map('#map', {
+        center: {
+          latitude: lat_home, longitude: lng_home
+        },
+        // Mapの表示距離間
+        zoom: 19,
+      });
+      pushPin(lat_home, lng_home, map);
+      generateInfobox(lat_home, lng_home, map);
+    }
+
+    // 現在位置の取得に失敗したの実行する関数
+    function showError(error) {
+      let e = "";
+      if (error.code == 1) {
+        e = "位置情報が許可されてません";
+      }
+      if (error.code == 2) {
+        e = "現在位置を特定できません";
+      }
+      if (error.code == 3) {
+        e = "位置情報を取得する前にタイムアウトになりました";
+      }
+      alert("error：" + e);
+    }
+
+    // 位置情報を取りにいく処理
+    window.onload = function () {
+      navigator.geolocation
+        .getCurrentPosition(mapsInit, showError, option);
+    }
+
+  // $('#output').on('click',funciton());
+  </script>
+</body>
+
+</html>
+
+<style>
+  #map {
+    height: calc(100% - 102px);
+    margin: 0;
+    padding: 0;
+  }
+
+  html,
+  body {
+    font-family: Roboto, "Yu Gothic Medium", "游ゴシック Medium", "游ゴシック体", "ヒラギノ角ゴ Pro W3", "メイリオ", sans-serif;
+    width: 960px;
+    font-size: 16px;
+    text-align: center;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .text {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .li_text {
+    padding: 0;
+    display: table;
+    /* 定義 */
+    table-layout: fixed;
+    width: 100%;
+  }
+
+  li {
+    text-align: center;
+    list-style-type: none;
+    border: 1px solid #666;
+    background-color: #FFF;
+    display: table-cell;
+    cursor: pointer;
+  }
+
+  li:hover {
+    background: #0066CC;
+    color: #fff;
+  }
+</style>
