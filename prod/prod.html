@@ -59,7 +59,7 @@
   <br><div id="map">MAP</div>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script src="https://www.bing.com/api/maps/mapcontrol?key=Ar1DVwBs9DUEY9cv6U8LjhXrI8Ov29FdHc3nFXWyG4IlbeLndVDXY0CfyMIAagmW"></script>
+  <script src="https://www.bing.com/api/maps/mapcontrol?key="></script>
   <script>
 
     // map表示用に使用する変数
@@ -92,33 +92,6 @@
               map.entities.push(pin);
 
             };
-
-// 複数Pin準備
-  function init() {
-    // Initialize the map
-    var map = new Microsoft.Maps.Map(
-      document.getElementById("map"),
-      {
-        credentials: "Ar1DVwBs9DUEY9cv6U8LjhXrI8Ov29FdHc3nFXWyG4IlbeLndVDXY0CfyMIAagmW",
-        mapTypeId: Microsoft.Maps.MapTypeId.road
-      }
-    );
-
-      // 複数pinを用意する
-      var pins = new Microsoft.Maps.EntityCollection();
-      // Creates 5 random pins
-      for (var i = 0; i < 5; i++) {
-        // A random position
-        var position = new Microsoft.Maps.Location(Math.random() * 45, Math.random() * 90);
-        // Creates a Pushpin
-        var pin = new Microsoft.Maps.Pushpin(position);
-        // Adds the pin to the collection instead of adding it directly to the Map
-        pins.push(pin);
-      }
-  // Adds all pins at once
-  map.entities.push(pins);
-  console.log(map.entities)
-}
 
 
           // 緯度，経度，表示したいマップを入力するとinfoboxをつくる関数を定義.表示内容を設定する.
