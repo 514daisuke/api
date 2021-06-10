@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>API課題</title>
+</head>
+
+<body>
+    <h1>周辺マップ</h1>
+
+    <div>
+        <button id="weatherButton">お天気情報</button>
+    </div>
+    <div id="weatherNews" class="weatherNewstext">
+        <h2>福岡県の概要</h2>
+        <table class="weather">
+            <tr id="publishingOffice">
+                <th>発表者</th>
+                <td></td>
+            </tr>
+            <tr id="reportDatetime">
+                <th>報告日時</th>
+                <td></td>
+            </tr>
+            <tr id="targetArea">
+                <th>対象地域</th>
+                <td></td>
+            </tr>
+            <tr id="today">
+                <th>今日の天気</th>
+                <td></td>
+            </tr>
+            <tr id="tomorrow">
+                <th>明日の天気</th>
+                <td></td>
+            </tr>
+            <tr id="dayAfterTomorrow">
+                <th>明後日の天気</th>
+                <td></td>
+            </tr>
+            <tr id="text">
+                <th>詳細</th>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+
+    <nav class="text">
+        <div class="li_text">
+            <li id="hp">病院</li>
+            <li id="tooth">歯科医院</li>
+            <li id="eye">眼科</li>
+            <li id="Ghp">総合医院</li>
+        </div>
+    </nav>
+    <br>
+    <div id="map">MAP</div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script
+        src="https://www.bing.com/api/maps/mapcontrol?key=Ar1DVwBs9DUEY9cv6U8LjhXrI8Ov29FdHc3nFXWyG4IlbeLndVDXY0CfyMIAagmW"></script>
+    <script>
+
+        // map表示用に使用する変数
+        let map;
+        // 天気取得URL
+        let url = "https://www.jma.go.jp/bosai/forecast/data/overview_forecast/400000.json";
+        // 天気予報
+        let url2 = "https://www.jma.go.jp/bosai/forecast/data/forecast/400000.json";
+        // 現在地を取得するときのオプション
+        const option = {
+            enableHighAccuracy: true,
+            maximumAge: 20000,
+            timeout: 100000000
+        };
+
+        // 緯度，経度，表示したいマップを入力するとピンを立てる関数を定義.
+        // ピンの色と表示するよう設定.
+        function pushPin(lat, lng, map) {
+            const location = new Microsoft.Maps.Location(lat, lng)
+            const pin = new Microsoft.Maps.Pushpin(location, {
+                color: 'navy', // 色の設定
+                visible: true, // これ書かないとピンが見えない
+            });
+            const location2 = new Microsoft.Maps.Location(lat, lng)
+            const pin2 = new Microsoft.Maps.Pushpin(location2, {
+                color: 'red',
+                visible: true,
+            });
+            map.entities.push(pin);
+            map.entities.push(pin2);
+        };
+
+        // 緯度，経度，表示したいマップを入力するとinfoboxをつくる関数を定義.表示内容を設定する.
+        function generateInfobox(lat, lng, map) {
+          const location = new Microsoft.Maps.Location(lat, lng)
+          const infobox = new Microsoft.Maps.Infobox(location, {
+            title: 'Welcome 木蓮の家',
+            description: "https://www.oasisnavi.jp/fukuoka/miyawaka/h006178/"
+          });
+          const location2 = new Microsoft.Maps.Location(lat, lng)
+          const infobox2 = new Microsoft.Maps.Infobox(location2, {
+            title: 'Hospital',
+            description: 'いきつけの病院です'
+          });
+          infobox.setMap(map);
+          infobox2.setMap(map);
+          }
+
+        // 現在地の取得に成功したときの関数
+        function mapsInit(position) {
+            console.log(position);
+            // const lat = position.coords.latitude;
+            // const lng = position.coords.longitude;
+            // 木蓮の家 home 33.73106482366766, 130.6549930221487
+            const lat_home = "33.73106482366766";
+            const lng_home = "130.6549930221487";
+            // 病院 hospital 33.730645555679715, 130.65415545521444
+            const lat_hospital = "33.73106482366766";
+            const lng_hospital = "130.6549930221487";
+            // // 歯科医院 dental clinic 33.72668893597604, 130.6704748839982
+            // const lat_dental = "33.73106482366766";
+            // const lng_dental = "130.6549930221487";
+            // // 眼科 Ophthalmology 33.72755716134463, 130.6660608289335
+            // const lat_Oph = "33.73106482366766";
+            // const lng_Oph = "130.6549930221487";
+            // // 総合病院 general Hospital 33.64205363313683, 130.69141273826682
+            // const lat_Ghospital = "33.73106482366766";
+            // const lng_Ghospital = "130.6549930221487";
+
+            map = new Microsoft.Maps.Map('#map', {
+                center: {
+                    latitude: lat_home, longitude: lng_home,
+                    latitude: lat_hospital, longitude: lat_hospital
+                    
+                },
+                
+                // Mapの表示距離間
+                zoom: 19,
+            });
+
+            pushPin(lat_home, lat_home, map);
+            generateInfobox(lat_home, lat_home, map);
+
+            pushPin(lat_hospital, lng_hospital, map);
+            generateInfobox(lat_hospital, lng_hospital, map);
+        }
+
+        // 現在位置の取得に失敗したの実行する関数
+        function showError(error) {
+            let e = "";
+            if (error.code == 1) {
+                e = "位置情報が許可されてません";
+            }
+            if (error.code == 2) {
+                e = "現在位置を特定できません";
+            }
+            if (error.code == 3) {
+                e = "位置情報を取得する前にタイムアウトになりました";
+            }
+            alert("error：" + e);
+        }
+
+        // 位置情報を取りにいく処理
+        window.onload = function () {
+            navigator.geolocation
+                .getCurrentPosition(mapsInit, showError, option);
+        }
+
+        // 時刻の表示をいい感じにするやつ（太郎先生作）
+        function convertFromFirestoreTimestampToDatetime(timestamp) {
+            const _d = timestamp ? new Date(timestamp * 1000) : new Date();
+            const Y = _d.getFullYear();
+            const m = (_d.getMonth() + 1).toString().padStart(2, '0');
+            const d = _d.getDate().toString().padStart(2, '0');
+            const H = _d.getHours().toString().padStart(2, '0');
+            const i = _d.getMinutes().toString().padStart(2, '0');
+            const s = _d.getSeconds().toString().padStart(2, '0');
+            return `${Y}/${m}/${d} ${H}:${i}:${s}`;
+        }
+
+
+        // 非表示
+        // $('#weatherNews').hide();
+
+        // $('#weatherButton').on('click', function () {
+        //   // 天気表示
+        //   $('#weatherNews').show();
+        // });
+
+        // 非表示 toggleで表示の切り替え
+        $(function () {
+            $('#weatherButton').click(function () {
+                $('#weatherNews').toggle("");
+            });
+        });
+
+
+
+        // 天気情報の取得
+        fetch(url)
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (weather) {
+                // console.log(weather);
+
+                // 発表者と報告日時の情報を画面に書き出す
+                document.getElementById("publishingOffice").lastElementChild.textContent = weather.publishingOffice;
+                document.getElementById("reportDatetime").lastElementChild.textContent = convertFromFirestoreTimestampToDatetime(weather.reportDatec);
+                document.getElementById("targetArea").lastElementChild.textContent = weather.targetArea;
+                document.getElementById("text").lastElementChild.innerHTML = weather.text.replace(/\n\n/g, '<br>');
+            });
+
+        // 天気予報の取得
+        fetch(url2)
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (weather) {
+                // console.log(weather);
+                // 福岡を選択して変数化
+                let area = weather[0].timeSeries[0].areas[0];
+                // console.log(area);
+                // 特定地域の情報を画面に書き出す
+                document.getElementById("targetArea").lastElementChild.textContent = area.area.name;
+                document.getElementById("today").lastElementChild.textContent = area.weathers[0];
+                document.getElementById("tomorrow").lastElementChild.textContent = area.weathers[1];
+                document.getElementById("dayAfterTomorrow").lastElementChild.textContent = area.weathers[2];
+            });
+
+
+    </script>
+</body>
+
+</html>
+
+<style>
+    #map {
+        height: calc(100% - 102px);
+        margin: 0;
+        padding: 0;
+    }
+
+    html,
+    body {
+        width: 960px;
+        font-size: 16px;
+        text-align: center;
+        height: 100%;
+        margin: 5rem;
+        padding: 0;
+    }
+
+    .text {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .li_text {
+        padding: 0;
+        display: table;
+        /* 定義 */
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    li {
+        text-align: center;
+        list-style-type: none;
+        border: 1px solid #666;
+        background-color: #FFF;
+        display: table-cell;
+        cursor: pointer;
+    }
+
+    li:hover {
+        background: #0066CC;
+        color: #fff;
+    }
+
+    .weather {
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* .weatherNewstext{
+
+} */
+</style>

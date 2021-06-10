@@ -10,18 +10,7 @@
 
 <body>
   <h1>周辺マップ</h1>
-      <nav class="text">
-        <div class="li_text">
-          <!-- <li><a href="">病院</a></li>
-          <li><a href="">歯科医院</a></li>
-          <li><a href="">眼科</a></li>
-          <li><a href="">総合医院</a></li>-->
-          <li>病院</li>
-          <li>歯科医院</li>
-          <li>眼科</li>
-          <li>総合医院</li>
-        </div>
-    </nav>
+
     <div>
       <button id="weatherButton">お天気情報</button>
     </div>
@@ -40,10 +29,18 @@
           <th>対象地域</th>
           <td></td>
         </tr>
-        <!-- <tr id="headlineText">
-          <th>ヘッドライン</th>
+        <tr id="today">
+          <th>今日の天気</th>
           <td></td>
-        </tr> -->
+        </tr>
+        <tr id="tomorrow">
+          <th>明日の天気</th>
+          <td></td>
+        </tr>
+        <tr id="dayAfterTomorrow">
+          <th>明後日の天気</th>
+          <td></td>
+        </tr>
         <tr id="text">
           <th>詳細</th>
           <td></td>
@@ -51,6 +48,14 @@
       </table>
     </div>
 
+      <nav class="text">
+        <div class="li_text">
+          <li id="hp">病院</li>
+          <li id="tooth">歯科医院</li>
+          <li id="eye">眼科</li>
+          <li id="Ghp">総合医院</li>
+        </div>
+      </nav>
   <br><div id="map">MAP</div>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -59,7 +64,15 @@
 
     // map表示用に使用する変数
     let map;
+
+    // 天気取得URL
     let url = "https://www.jma.go.jp/bosai/forecast/data/overview_forecast/400000.json";
+    // 天気予報
+    let url2 = "https://www.jma.go.jp/bosai/forecast/data/forecast/400000.json";
+    // 災害通知用
+    let url3 = "";
+
+
        // 現在地を取得するときのオプション
         const option = {
           enableHighAccuracy: true,
@@ -71,23 +84,64 @@
           // ピンの色と表示するよう設定.
           function pushPin(lat, lng, map) {
             const location = new Microsoft.Maps.Location(lat, lng)
-              const pin = new Microsoft.Maps.Pushpin(location, {
+            const pin = new Microsoft.Maps.Pushpin(location, {
                 color: 'navy', // 色の設定
                 visible: true, // これ書かないとピンが見えない
               });
+              // map.entities.push(pin);
               map.entities.push(pin);
+
             };
 
-          // 緯度，経度，表示したいマップを入力するとinfoboxをつくる関数を定義.
-          // 表示内容を設定する.
+// 複数Pin準備
+  function init() {
+    // Initialize the map
+    var map = new Microsoft.Maps.Map(
+      document.getElementById("map"),
+      {
+        credentials: "Ar1DVwBs9DUEY9cv6U8LjhXrI8Ov29FdHc3nFXWyG4IlbeLndVDXY0CfyMIAagmW",
+        mapTypeId: Microsoft.Maps.MapTypeId.road
+      }
+    );
+
+      // 複数pinを用意する
+      var pins = new Microsoft.Maps.EntityCollection();
+      // Creates 5 random pins
+      for (var i = 0; i < 5; i++) {
+        // A random position
+        var position = new Microsoft.Maps.Location(Math.random() * 45, Math.random() * 90);
+        // Creates a Pushpin
+        var pin = new Microsoft.Maps.Pushpin(position);
+        // Adds the pin to the collection instead of adding it directly to the Map
+        pins.push(pin);
+      }
+  // Adds all pins at once
+  map.entities.push(pins);
+  console.log(map.entities)
+}
+
+
+          // 緯度，経度，表示したいマップを入力するとinfoboxをつくる関数を定義.表示内容を設定する.
           function generateInfobox(lat, lng, map) {
             const location = new Microsoft.Maps.Location(lat, lng)
             const infobox = new Microsoft.Maps.Infobox(location, {
               title: 'Welcome 木蓮の家',
               description: "https://www.oasisnavi.jp/fukuoka/miyawaka/h006178/"
             });
+            //２つめのpin
+            const location2 = new Microsoft.Maps.Location(lat, lng)
+            const infobox2 = new Microsoft.Maps.Infobox(location2, {
+              title: 'Hospital',
+              description: "病院！"
+            });
+
+              // infobox.setMap(map);
               infobox.setMap(map);
             }
+
+
+
+
 
         // 現在地の取得に成功したときの関数
         function mapsInit(position) {
@@ -95,7 +149,7 @@
           // console.log(position);
           // const lat = position.coords.latitude;
           // const lng = position.coords.longitude;
-          // 木蓮の家
+          // 木蓮の家 home
           // 33.73106482366766, 130.6549930221487
           const lat_home = "33.73106482366766";
           const lng_home = "130.6549930221487";
@@ -111,24 +165,46 @@
           // 33.72755716134463, 130.6660608289335
           const lat_Oph = "33.73106482366766";
           const lng_Oph = "130.6549930221487";
-          // 総合病院general Hospital
+          // 総合病院 general Hospital
           // 33.64205363313683, 130.69141273826682
           const lat_Ghospital = "33.73106482366766";
           const lng_Ghospital = "130.6549930221487";
 
           map = new Microsoft.Maps.Map('#map', {
             center: {
-              latitude: lat_home, longitude: lng_home
+              latitude: lat_home,
+              longitude: lng_home,
+
+              // ２つめ
+              latitude: lat_hospital,
+              longitude: lng_hospital,
             },
 
-
-            
             // Mapの表示距離間
             zoom: 19,
           });
           pushPin(lat_home, lng_home, map);
           generateInfobox(lat_home, lng_home, map);
+
         }
+
+
+
+    // 各地点よりのピン遷移（未実装）
+    $(function () {
+      $('#hp').click(function () {
+        $('#hp').text("ピンに遷移する");
+      });
+      $('#tooth').click(function () {
+        $('#tooth').text("ピンに遷移する");
+      });
+      $('#eye').click(function () {
+        $('#eye').text("ピンに遷移する");
+      });
+      $('#Ghp').click(function () {
+        $('#Ghp').text("ピンに遷移する");
+      });
+    });
 
         // 現在位置の取得に失敗したの実行する関数
         function showError(error) {
@@ -163,38 +239,47 @@
         return `${Y}/${m}/${d} ${H}:${i}:${s}`;
       }
 
-      //追加機能
-
-
-
-
-
-
-
-
-
-
-
-  // 非表示
   $('#weatherNews').hide();
-  // 天気表示
-  $('#weatherButton').on('click', function () {
-    $('#weatherNews').show();
+
+  // 非表示 toggleで表示の切り替え
+  $(function () {
+    $('#weatherButton').click(function () {
+      $('#weatherNews').toggle("");
+    });
   });
+
 // 天気情報の取得
       fetch(url)
         .then(function (response) {
           return response.json();
         })
         .then(function (weather) {
-          console.log(weather);
-        // 画面に書き出す
+          // console.log(weather);
+
+        // 発表者と報告日時の情報を画面に書き出す
           document.getElementById("publishingOffice").lastElementChild.textContent = weather.publishingOffice;
           document.getElementById("reportDatetime").lastElementChild.textContent = convertFromFirestoreTimestampToDatetime(weather.reportDatec);
           document.getElementById("targetArea").lastElementChild.textContent = weather.targetArea;
-          // document.getElementById("headlineText").lastElementChild.textContent = weather.headlineText;
           document.getElementById("text").lastElementChild.innerHTML = weather.text.replace(/\n\n/g, '<br>');
         });
+
+// 天気予報の取得
+  fetch(url2)
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (weather) {
+      // console.log(weather);
+      // 福岡を選択して変数化
+      let area = weather[0].timeSeries[0].areas[0];
+      // console.log(area);
+      // 特定地域の情報を画面に書き出す
+      document.getElementById("targetArea").lastElementChild.textContent = area.area.name;
+      document.getElementById("today").lastElementChild.textContent = area.weathers[0];
+      document.getElementById("tomorrow").lastElementChild.textContent = area.weathers[1];
+      document.getElementById("dayAfterTomorrow").lastElementChild.textContent = area.weathers[2];
+    });
+
 
   </script>
 </body>
